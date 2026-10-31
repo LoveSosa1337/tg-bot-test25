@@ -11,14 +11,13 @@
             background-color: var(--tg-theme-bg-color, #18222d);
             color: var(--tg-theme-text-color, #ffffff);
             margin: 0;
-            padding: 20px;
+            padding: 16px;
             box-sizing: border-box;
         }
         .card {
             background-color: var(--tg-theme-secondary-bg-color, #213040);
             padding: 18px;
             border-radius: 14px;
-            margin-bottom: 16px;
         }
         h2 { margin: 0 0 6px 0; font-size: 20px; }
         p { margin: 0 0 14px 0; font-size: 13px; color: var(--tg-theme-hint-color, #8b9bab); }
@@ -32,7 +31,7 @@
             background-color: var(--tg-theme-bg-color, #18222d);
             color: var(--tg-theme-text-color, #ffffff);
             box-sizing: border-box;
-            margin-bottom: 14px;
+            margin-bottom: 12px;
             outline: none;
         }
         .chips {
@@ -42,9 +41,9 @@
             margin-bottom: 14px;
         }
         .chip {
-            padding: 6px 12px;
+            padding: 6px 10px;
             border-radius: 8px;
-            font-size: 13px;
+            font-size: 12px;
             background-color: var(--tg-theme-bg-color, #18222d);
             color: var(--tg-theme-text-color, #ffffff);
             cursor: pointer;
@@ -60,19 +59,20 @@
             background-color: var(--tg-theme-button-color, #2ea6ff);
             color: var(--tg-theme-button-text-color, #ffffff);
             cursor: pointer;
+            margin-top: 6px;
         }
     </style>
 </head>
 <body>
     <div class="card">
         <h2>🎯 Avito Sniper</h2>
-        <p>Настройте фильтры для поиска самых дешевых объявлений без мусора</p>
+        <p>Поиск самых дешевых объявлений с защитой от мусора</p>
 
-        <label>Что ищем?</label>
+        <label>Название товара:</label>
         <input type="text" id="query" placeholder="Например: iPhone 15 128gb">
 
-        <label>🛡 Анти-мусор (минимальная цена, ₽)</label>
-        <input type="number" id="min_price" value="0" placeholder="Например: 35000">
+        <label>🛡 Минимальная цена (отсечь чехлы и запчасти, ₽):</label>
+        <input type="number" id="min_price" value="0" placeholder="0">
         <div class="chips">
             <span class="chip" onclick="setPrice(1000)">от 1 000 ₽</span>
             <span class="chip" onclick="setPrice(10000)">от 10 000 ₽</span>
@@ -80,7 +80,7 @@
             <span class="chip" onclick="setPrice(50000)">от 50 000 ₽</span>
         </div>
 
-        <label>🌍 Регион поиска</label>
+        <label>🌍 Регион:</label>
         <select id="region">
             <option value="all">🇷🇺 Вся Россия</option>
             <option value="moskva">🏙 Москва</option>
@@ -92,6 +92,7 @@
 
     <script>
         const tg = window.Telegram.WebApp;
+        tg.ready();
         tg.expand();
 
         function setPrice(val) {
@@ -108,11 +109,13 @@
                 return;
             }
 
-            tg.sendData(JSON.stringify({
+            const payload = JSON.stringify({
                 query: query,
                 min_price: min_price,
                 region: region
-            }));
+            });
+
+            tg.sendData(payload);
             tg.close();
         });
     </script>
