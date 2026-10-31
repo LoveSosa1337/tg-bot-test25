@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Telegram Mini App</title>
+    <!-- Подключаем официальный скрипт Telegram WebApp -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            /* Используем системные цвета темы пользователя Telegram */
+            background-color: var(--tg-theme-bg-color, #ffffff);
+            color: var(--tg-theme-text-color, #000000);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+            text-align: center;
+        }
+        .card {
+            background-color: var(--tg-theme-secondary-bg-color, #f0f0f0);
+            padding: 24px;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 320px;
+            margin-bottom: 20px;
+        }
+        .counter {
+            font-size: 48px;
+            font-weight: bold;
+            margin: 16px 0;
+        }
+        button {
+            background-color: var(--tg-theme-button-color, #3390ec);
+            color: var(--tg-theme-button-text-color, #ffffff);
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: 10px;
+            cursor: pointer;
+            width: 100%;
+        }
+        button:active {
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <h2 id="greeting">Привет!</h2>
+        <p>Нажми на кнопку, чтобы собрать очки и отправить их боту:</p>
+        <div class="counter" id="score">0</div>
+        <button id="click-btn">+1 очко</button>
+    </div>
+
+    <script>
+        const tg = window.Telegram.WebApp;
+        
+        // Сообщаем Telegram, что приложение готово, и разворачиваем на весь экран
+        tg.ready();
+        tg.expand();
+
+        // Получаем имя пользователя из данных Telegram
+        const user = tg.initDataUnsafe?.user;
+        if (user && user.first_name) {
+            document.getElementById('greeting').innerText = `Привет, ${user.first_name}!`;
+        }
+
+        let count = 0;
+        const scoreEl = document.getElementById('score');
+        const clickBtn = document.getElementById('click-btn');
+
+        // Настраиваем главную нижнюю кнопку Telegram (MainButton)
+        tg.MainButton.setText("Отправить результат в бота");
+
+        clickBtn.addEventListener('click', () => {
+            count++;
+            scoreEl.innerText = count;
+            
+            // Легкая вибрация при клике (работает на смартфонах)
+            tg.HapticFeedback.impactOccurred('light');
+
+            if (!tg.MainButton.isVisible) {
+                tg.MainButton.show();
+            }
+        });
+
+        // Обработка нажатия на нижнюю кнопку Telegram
+        tg.MainButton.onClick(() => {
+            const data = JSON.stringify({ score: count });
+            // Отправляем данные обратно боту (работает при открытии через KeyboardButton)
+            tg.sendData(data);
+        });
+    </script>
+</body>
+</html>
